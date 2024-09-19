@@ -156,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     "ĐẶT NGAY",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: const Color.fromARGB(255, 151, 127, 127),
                         fontSize: 22.0,
                         fontWeight: FontWeight.bold),
                   ),
