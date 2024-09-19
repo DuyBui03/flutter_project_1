@@ -12,6 +12,13 @@
             "name": "frontend web", // Tên cấu hình cho frontend web
             "cwd": "frontend", // Đặt thư mục làm việc hiện tại cho frontend
             "request": "launch", // Yêu cầu kiểu launch
+            "type": "dart" // Trình gỡ lỗi là Dart
+        
+        },
+        {
+            "name": "frontend web", // Tên cấu hình cho frontend web
+            "cwd": "frontend", // Đặt thư mục làm việc hiện tại cho frontend
+            "request": "launch", // Yêu cầu kiểu launch
             "type": "dart", // Trình gỡ lỗi là Dart
             "args": [
                 "-d", // Cờ chỉ định trình duyệt sẽ mở
