@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -48,14 +50,35 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+  /// Controller để lấy dữ liệu từ Widget TextField
+  final controller = TextEditingController();
+
+  /// Biến để lưu thông điệp phản hồi từ server
+  String responseMessage = '';
+
+  /// Sử dụng địa chỉ IP thích hợp cho backend
+  /// Do Android Emulator sử dụng  địa chỉ 10.0.2.2 để truy cập vào localhost
+  /// của máy chủ thay vì localhost hoặc 127.0.0.1
+  String getBackendUrl() {
+    if (kIsWeb) {
+      return 'http://localhost:8080'; // hoặc sử dụng IP LAN nếu cần
+    } else if (Platform.isAndroid) {
+      return 'http://10.0.2.2:8080'; // cho emulator
+      // return 'http://192.168.1.x:8080'; // cho thiết bị thật khi truy cập qua LAN
+    } else {
+      return 'http://localhost:8080';
+    }
+  }
 
   /// Hàm để gửi dữ liệu tới server
   Future<void> _sendData() async {
     final name = _controller.text.trim();
     final time = _selectedTime.format(context);
     _controller.clear();
+    final backendUrl = getBackendUrl();
 
-    final Uri url = Uri.parse('http://localhost:8080/api/v1/submit');
+    // Endpoint submit của server
+    final url = Uri.parse('$backendUrl/api/v1/submit');
     try {
       final http.Response response = await http
           .post(
