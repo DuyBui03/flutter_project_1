@@ -21,14 +21,8 @@ Response _notFoundHandler(Request req) {
 }
 
 /// Hàm xử lý các yêu cầu gốc tại đường dẫn '/'
-///
 /// Trả về một phản hồi với thông điệp "Hello, World!" dưới dạng JSON
-///
-/// `reg`: Đối tượng yêu cầu từ client
-///
-/// Trả về: Một đối tượng `Response` với mã trạng thái 200 và nội dung JSON
 Response _rootHandler(Request req) {
-  // Constructor `ok` của Response có statusCode là 200
   return Response.ok(
     json.encode({'message': 'Hello, World!'}),
     headers: _headers,
@@ -38,7 +32,7 @@ Response _rootHandler(Request req) {
 /// Hàm xử lý yêu cầu tại đường dẫn '/api/v1/check'
 Response _checkHandler(Request req) {
   return Response.ok(
-    json.encode({'message': 'Chào mừng bạn đến với ứng dụng'}),
+    json.encode({'message': 'Chào mừng bạn đến với ứng dụng web động'}),
     headers: _headers,
   );
 }
@@ -56,13 +50,16 @@ Future<Response> _submitHandler(Request req) async {
     // Giải mã JSON từ payload
     final data = json.decode(payload);
 
-    // Lấy giá trị 'name' từ data, ép kiểu về String? nếu có
+    // Lấy giá trị 'name' và 'time' từ data
     final name = data['name'] as String?;
+    final time = data['time'] as String?;
 
-    // Kiểm tra nếu 'name' hợp lệ
-    if (name != null && name.isNotEmpty) {
+    // Kiểm tra nếu 'name' và 'time' hợp lệ
+    if (name != null && name.isNotEmpty && time != null && time.isNotEmpty) {
       // Tạo phản hồi chào mừng
-      final response = {'message': 'Chào mừng $name'};
+      final response = {
+        'message': 'Chào mừng $name! Bạn đã chọn thời gian: $time'
+      };
 
       // Trả về phản hồi với statusCode 200 và nội dung JSON
       return Response.ok(
@@ -70,8 +67,10 @@ Future<Response> _submitHandler(Request req) async {
         headers: _headers,
       );
     } else {
-      // Tạo phản hồi yêu cầu cung cấp tên
-      final response = {'message': 'Server không nhận được tên của bạn.'};
+      // Tạo phản hồi yêu cầu cung cấp tên và thời gian
+      final response = {
+        'message': 'Server không nhận được tên hoặc thời gian của bạn.'
+      };
 
       // Trả về phản hồi với statusCode 400 và nội dung JSON
       return Response.badRequest(
@@ -94,6 +93,7 @@ Future<Response> _submitHandler(Request req) async {
 void main(List<String> args) async {
   // Lắng nghe trên tất cả các địa chỉ IPv4
   final ip = InternetAddress.anyIPv4;
+
   final corsHeader = createMiddleware(
     requestHandler: (req) {
       if (req.method == 'OPTIONS') {
@@ -116,9 +116,10 @@ void main(List<String> args) async {
   );
 
   // Cấu hình một pipeline để logs các requests và middleware
-  final handler =
-      Pipeline().addMiddleware(corsHeader) .addMiddleware(logRequests()).addHandler(_router.call);
-  // Cấu hình một pipeline để logs các requests và middleware
+  final handler = Pipeline()
+      .addMiddleware(corsHeader) // Thêm middleware xử lý CORS
+      .addMiddleware(logRequests())
+      .addHandler(_router.call);
 
   // Để chạy trong các container, chúng ta sẽ sử dụng biến môi trường PORT.
   // Nếu biến môi trường không được thiết lập nó sẽ sử dụng giá trị từ biến
