@@ -238,6 +238,58 @@ void main(List<String> args) async {
   print('Server đang chạy tại http://${server.address.host}:${server.port}');
 }
 ```
+4. Update code thêm nội dung thời gian:
+```dart
+
+Future<Response> _submitHandler(Request req) async {
+  try {
+    // Đọc payload từ request
+    final payload = await req.readAsString();
+
+    // Giải mã JSON từ payload
+    final data = json.decode(payload);
+
+    // Lấy giá trị 'name' và 'time' từ data
+    final name = data['name'] as String?;
+    final time = data['time'] as String?;
+
+    // Kiểm tra nếu 'name' và 'time' hợp lệ
+    if (name != null && name.isNotEmpty && time != null && time.isNotEmpty) {
+      // Tạo phản hồi chào mừng
+      final response = {
+        'message': 'Chào mừng $name! Bạn đã chọn thời gian: $time'
+      };
+
+      // Trả về phản hồi với statusCode 200 và nội dung JSON
+      return Response.ok(
+        json.encode(response),
+        headers: _headers,
+      );
+    } else {
+      // Tạo phản hồi yêu cầu cung cấp tên và thời gian
+      final response = {
+        'message': 'Server không nhận được tên hoặc thời gian của bạn.'
+      };
+
+      // Trả về phản hồi với statusCode 400 và nội dung JSON
+      return Response.badRequest(
+        body: json.encode(response),
+        headers: _headers,
+      );
+    }
+  } catch (e) {
+    // Xử lý ngoại lệ khi giải mã JSON
+    final response = {'message': 'Yêu cầu không hợp lệ. Lỗi ${e.toString()}'};
+
+    // Trả về phản hồi với statusCode 400
+    return Response.badRequest(
+      body: json.encode(response),
+      headers: _headers,
+    );
+  }
+}
+
+```
 ### Bước 7: Phát triển frontend và tích hợp hệ thống
 1. Chỉnh sửa mã nguồn frontend
 - Mở tệp frontend/lib/main.dart và thay thế nội dung bằng mã sau:
