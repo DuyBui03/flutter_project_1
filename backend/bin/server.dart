@@ -94,10 +94,30 @@ Future<Response> _submitHandler(Request req) async {
 void main(List<String> args) async {
   // Lắng nghe trên tất cả các địa chỉ IPv4
   final ip = InternetAddress.anyIPv4;
+  final corsHeader = createMiddleware(
+    requestHandler: (req) {
+      if (req.method == 'OPTIONS') {
+        return Response.ok('', headers: {
+          // Cho phép mọi nguồn truy cập (trong môi trường dev). Trong môi trường production chúng ta nên thay * bằng domain cụ thể.
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, HEAD',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        });
+      }
+      return null; // Tiếp tục xử lý các yêu cầu khác
+    },
+    responseHandler: (res) {
+      return res.change(headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      });
+    },
+  );
 
   // Cấu hình một pipeline để logs các requests và middleware
   final handler =
-      Pipeline().addMiddleware(logRequests()).addHandler(_router.call);
+      Pipeline().addMiddleware(corsHeader) .addMiddleware(logRequests()).addHandler(_router.call);
   // Cấu hình một pipeline để logs các requests và middleware
 
   // Để chạy trong các container, chúng ta sẽ sử dụng biến môi trường PORT.
@@ -107,5 +127,5 @@ void main(List<String> args) async {
 
   // Khởi chạy server tại địa chỉ và cổng chỉ định
   final server = await serve(handler, ip, port);
-  print('Server đang chạy tại ${server.port}');
+  print('Server đang chạy tại http://${server.address.host}:${server.port}');
 }
