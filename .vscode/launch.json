@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0", // Phiên bản của định dạng cấu hình
+    "configurations": [
+        {
+            "name": "backend", // Tên cấu hình cho backend
+            "cwd": "backend", // Đặt thư mục làm việc hiện tại cho backend
+            "request": "launch", // Yêu cầu kiểu launch, tức là khởi động chương trình
+            "type": "dart", // Loại trình gỡ lỗi là Dart
+            "program": "bin/server.dart" // Đường dẫn đến file Dart để chạy
+        },
+        {
+            "name": "frontend web", // Tên cấu hình cho frontend web
+            "cwd": "frontend", // Đặt thư mục làm việc hiện tại cho frontend
+            "request": "launch", // Yêu cầu kiểu launch
+            "type": "dart", // Trình gỡ lỗi là Dart
+            "args": [
+                "-d", // Cờ chỉ định trình duyệt sẽ mở
+                "chrome", // Chạy trên trình duyệt Chrome
+                "--web-port", // Đặt cổng cho ứng dụng web
+                "8081" // Cổng 8081
+            ]
+        }
+    ]
+}
